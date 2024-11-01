@@ -25,9 +25,11 @@ def create_task():
 def get_all_tasks():
     query = db.select(Task)
 
-    title_param = request.args.get("title")
-    if title_param:
-        query = query.where(Task.title.ilike(f"%{title_param}%")).order_by(Task.id)
+    sort_param = request.args.get("sort")
+    if sort_param == "asc":
+        query = query.order_by(Task.title)
+    elif sort_param == "desc":
+        query = query.order_by(Task.title.desc())
     
     description_param = request.args.get("description")
     if description_param:
