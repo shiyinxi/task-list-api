@@ -47,7 +47,7 @@ def get_all_tasks():
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
     
-    return task.to_dict()
+    return {"task": task.to_dict()}
 
 @bp.put("/<task_id>")
 def update_book(task_id):
@@ -58,9 +58,9 @@ def update_book(task_id):
     task.description = request_body["description"]
     db.session.commit()
 
-    response = f"Task #{task_id} successfully updated"
+    response = {"task": task.to_dict()}
     # return Response(response, status=200, mimetype="application/json")
-    return Response(json.dumps(response),status=200, mimetype="application/json")
+    return response, 200
 
 @bp.delete("/<task_id>")
 def delete_task(task_id):
@@ -68,5 +68,6 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
 
-    response = f"Task #{task_id} successfully deleted"
-    return Response(json.dumps(response),status=200, mimetype="application/json")
+    response = {"details": f'Task {task_id} "{task.title}" successfully deleted'}
+    # 
+    return response, 200
