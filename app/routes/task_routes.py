@@ -3,6 +3,7 @@ from app.models.task import Task
 from ..db import db
 import json
 from app.routes.route_utilities import validate_model
+from datetime import datetime
 
 bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -72,4 +73,25 @@ def delete_task(task_id):
 
     response = {"details": f'Task {task_id} "{task.title}" successfully deleted'}
     # 
+    return response, 200
+
+@bp.patch("/<task_id>/mark_complete")
+def patch_complete(task_id):
+    
+    task = validate_model(Task, task_id)
+    task.completed_at = datetime.now()
+    db.session.commit()
+
+    response = {"task": task.to_dict()}
+
+    return response, 200
+
+@bp.patch("/<task_id>/mark_incomplete")
+def patch_incomplete(task_id):
+    task = validate_model(Task, task_id)
+    task.completed_at = None
+    db.session.commit()
+
+    response = {"task": task.to_dict()}
+
     return response, 200
