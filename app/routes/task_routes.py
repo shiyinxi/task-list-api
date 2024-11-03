@@ -4,6 +4,8 @@ from ..db import db
 import json
 from app.routes.route_utilities import validate_model
 from datetime import datetime
+import requests
+import os
 
 bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -79,8 +81,20 @@ def delete_task(task_id):
 def patch_complete(task_id):
     
     task = validate_model(Task, task_id)
-    task.completed_at = datetime.now()
+    task.completed_at = datetime.now().isoformat()
     db.session.commit()
+
+    url = "https://slack.com/api/chat.postMessage"
+    headers = {
+        "Authorization": f"Bearer {os.environ.get('SLACK_API_KEY')}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "channel" : "#task-notifications",
+        "text": f"Someone just completed the task {task.title}"
+    }
+
+    requests.post(url, headers=headers, json=data)
 
     response = {"task": task.to_dict()}
 
