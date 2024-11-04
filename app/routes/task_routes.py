@@ -109,3 +109,4 @@ def patch_incomplete(task_id):
     response = {"task": task.to_dict()}
 
     return response, 200
+
